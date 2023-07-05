@@ -1,6 +1,4 @@
-mod cookie;
-
-use cookie::*;
+use cookie_parse::cookie::{parse_cookies, print_cookies};
 
 // https://confluence.metro.ad.selinc.com/pages/viewpage.action?pageId=1921190652
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cookie
