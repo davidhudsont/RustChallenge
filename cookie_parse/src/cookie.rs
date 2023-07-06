@@ -94,7 +94,7 @@ pub fn parse_cookies4(cookie_line: &str) -> Option<HashMap<String, String>> {
 }
 
 #[inline]
-pub fn parse_cookies(cookie_line: &str) -> Option<HashMap<String, String>> {
+pub fn parse_cookies6(cookie_line: &str) -> Option<HashMap<String, String>> {
     cookie_line.strip_prefix("Cookie: ").map(|cookies| {
         cookies
             .split("; ")
@@ -102,6 +102,32 @@ pub fn parse_cookies(cookie_line: &str) -> Option<HashMap<String, String>> {
             .map(|cookie_pair| (cookie_pair.0.to_owned(), cookie_pair.1.to_owned()))
             .collect()
     })
+}
+
+#[inline]
+pub fn parse_cookies(cookie_line: &str) -> Option<HashMap<String, String>> {
+    match cookie_line.strip_prefix("Cookie:") {
+        Some(cookies) => {
+            let cookie_pairs: Vec<_> = cookies.trim().split("; ").collect();
+
+            let mut cookie_map: HashMap<_,_> = HashMap::new();
+            for cookie_pair in &cookie_pairs {
+                if let Some((name, value)) = cookie_pair.split_once('=') {
+                    cookie_map.insert(name.to_owned(), value.to_owned());
+                }
+                else {
+                    return None;
+                }
+            }
+
+            if cookie_map.is_empty() {
+                None
+            } else {
+                Some(cookie_map)
+            }
+        }
+        None => None,
+    }
 }
 
 pub fn print_cookies(cookies: HashMap<String, String>) -> String {
@@ -114,6 +140,18 @@ pub fn print_cookies(cookies: HashMap<String, String>) -> String {
 #[test]
 fn test_given_example() {
     let c = parse_cookies("Cookie: name=value; name2=value2");
+    assert_eq!(
+        c,
+        Some(HashMap::from([
+            ("name2".to_string(), "value2".to_string()),
+            ("name".to_string(), "value".to_string()),
+        ]))
+    );
+}
+
+#[test]
+fn test_given_example_ows() {
+    let c = parse_cookies("Cookie:name=value; name2=value2 ");
     assert_eq!(
         c,
         Some(HashMap::from([
@@ -166,3 +204,22 @@ fn test_reject_invalid_header_name() {
     let c = parse_cookies("Cooookie: name=value; name2=value2");
     assert_eq!(c, None);
 }
+
+#[test]
+fn test_invalid_separator() {
+    let c = parse_cookies("Cookie: name=value; name2]value2");
+    assert_eq!(c, None);
+}
+
+#[test]
+fn test_invalid_separator2() {
+    let c = parse_cookies("Cookie: name]value");
+    assert_eq!(c, None);
+}
+
+#[test]
+fn test_invalid_separator3() {
+    let c = parse_cookies("Cookie: name=value[ name2=value2");
+    assert_eq!(c, None);
+}
+
