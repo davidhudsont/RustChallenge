@@ -112,8 +112,8 @@ fn parse_cookie_pair(cookie_pair: &str) -> Option<(String, String)> {
 
 #[inline]
 pub fn parse_cookies(cookie_line: &str) -> Option<HashMap<String, String>> {
-    let semicolon_count = cookie_line.chars().filter(|c| *c == ';').count();
-    let equals_count = cookie_line.chars().filter(|c| *c == '=').count();
+    let semicolon_count = cookie_line.matches("; ").count();
+    let equals_count = cookie_line.matches('=').count();
     if (equals_count == 0)
         || (semicolon_count == 0 && equals_count > 1)
         || (semicolon_count != (equals_count - 1))
@@ -216,5 +216,17 @@ fn test_invalid_separator2() {
 #[test]
 fn test_invalid_separator3() {
     let c = parse_cookies("Cookie: name=value[ name2=value2");
+    assert_eq!(c, None);
+}
+
+#[test]
+fn test_invalid_separator4() {
+    let c = parse_cookies("Cookie: name=value; name2=value2. name3=value3");
+    assert_eq!(c, None);
+}
+
+#[test]
+fn test_invalid_separator5() {
+    let c = parse_cookies("Cookie: name=value;name2=value2");
     assert_eq!(c, None);
 }
