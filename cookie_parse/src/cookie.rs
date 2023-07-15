@@ -104,7 +104,7 @@ pub fn parse_cookies6(cookie_line: &str) -> Option<HashMap<String, String>> {
     })
 }
 
-fn convert_cookie(cookie_pair: &&str) -> Option<(String, String)> {
+fn parse_cookie_pair(cookie_pair: &&str) -> Option<(String, String)> {
     cookie_pair
         .split_once("=")
         .map_or(None, |c| Some((c.0.to_owned(), c.1.to_owned())))
@@ -116,7 +116,7 @@ pub fn parse_cookies(cookie_line: &str) -> Option<HashMap<String, String>> {
         Some(cookies) => {
             let cookie_pairs: Vec<_> = cookies.trim().split("; ").collect();
 
-            cookie_pairs.iter().map(convert_cookie).collect()
+            cookie_pairs.iter().map(parse_cookie_pair).collect()
         }
         None => None,
     }
