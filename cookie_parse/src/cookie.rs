@@ -110,12 +110,11 @@ pub fn parse_cookies(cookie_line: &str) -> Option<HashMap<String, String>> {
         Some(cookies) => {
             let cookie_pairs: Vec<_> = cookies.trim().split("; ").collect();
 
-            let mut cookie_map: HashMap<_,_> = HashMap::new();
+            let mut cookie_map: HashMap<_, _> = HashMap::new();
             for cookie_pair in &cookie_pairs {
                 if let Some((name, value)) = cookie_pair.split_once('=') {
                     cookie_map.insert(name.to_owned(), value.to_owned());
-                }
-                else {
+                } else {
                     return None;
                 }
             }
@@ -222,4 +221,3 @@ fn test_invalid_separator3() {
     let c = parse_cookies("Cookie: name=value[ name2=value2");
     assert_eq!(c, None);
 }
-

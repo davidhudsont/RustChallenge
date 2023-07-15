@@ -5,8 +5,7 @@ use cookie_parse::cookie::{parse_cookies, print_cookies};
 
 // Example: 'Cookie: name=value; name2=value2'
 
-pub fn main(){
+pub fn main() {
     let c = parse_cookies("Cookie: name=value; name2=value2").unwrap();
     println!("{}", print_cookies(c));
 }
-
