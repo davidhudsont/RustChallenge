@@ -112,14 +112,10 @@ fn parse_cookie_pair(cookie_pair: &&str) -> Option<(String, String)> {
 
 #[inline]
 pub fn parse_cookies(cookie_line: &str) -> Option<HashMap<String, String>> {
-    match cookie_line.strip_prefix("Cookie:") {
-        Some(cookies) => {
-            let cookie_pairs: Vec<_> = cookies.trim().split("; ").collect();
-
-            cookie_pairs.iter().map(parse_cookie_pair).collect()
-        }
-        None => None,
-    }
+    cookie_line.strip_prefix("Cookie:").map_or(None, |cookies| {
+        let cookie_pairs: Vec<_> = cookies.trim().split("; ").collect();
+        cookie_pairs.iter().map(parse_cookie_pair).collect()
+    })
 }
 
 pub fn print_cookies(cookies: HashMap<String, String>) -> String {
