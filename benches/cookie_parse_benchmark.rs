@@ -18,6 +18,9 @@ fn bench_parse_cookies(c: &mut Criterion) {
     group.bench_function("Cookie Parse 4th Attempt", |b| {
         b.iter(|| parse_cookies4(black_box(COOKIE)))
     });
+    group.bench_function("Cookie Parse 5th Attempt", |b| {
+        b.iter(|| parse_cookies5(black_box(COOKIE)))
+    });
     group.bench_function("Cookie Parse Final", |b| {
         b.iter(|| parse_cookies(black_box(COOKIE)))
     });

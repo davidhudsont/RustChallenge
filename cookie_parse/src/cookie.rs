@@ -94,7 +94,7 @@ pub fn parse_cookies4(cookie_line: &str) -> Option<HashMap<String, String>> {
 }
 
 #[inline]
-pub fn parse_cookies6(cookie_line: &str) -> Option<HashMap<String, String>> {
+pub fn parse_cookies5(cookie_line: &str) -> Option<HashMap<String, String>> {
     cookie_line.strip_prefix("Cookie: ").map(|cookies| {
         cookies
             .split("; ")
@@ -104,7 +104,7 @@ pub fn parse_cookies6(cookie_line: &str) -> Option<HashMap<String, String>> {
     })
 }
 
-fn parse_cookie_pair(cookie_pair: &&str) -> Option<(String, String)> {
+fn parse_cookie_pair(cookie_pair: &str) -> Option<(String, String)> {
     cookie_pair
         .split_once("=")
         .and_then(|c| Some((c.0.to_owned(), c.1.to_owned())))
@@ -112,10 +112,18 @@ fn parse_cookie_pair(cookie_pair: &&str) -> Option<(String, String)> {
 
 #[inline]
 pub fn parse_cookies(cookie_line: &str) -> Option<HashMap<String, String>> {
-    cookie_line.strip_prefix("Cookie:").and_then(|cookies| {
-        let cookie_pairs: Vec<_> = cookies.trim().split("; ").collect();
-        cookie_pairs.iter().map(parse_cookie_pair).collect()
-    })
+    let semicolon_count = cookie_line.chars().filter(|c| *c == ';').count();
+    let equals_count = cookie_line.chars().filter(|c| *c == '=').count();
+    if (equals_count == 0)
+        || (semicolon_count == 0 && equals_count > 1)
+        || (semicolon_count != (equals_count - 1))
+    {
+        return None;
+    }
+
+    cookie_line
+        .strip_prefix("Cookie:")
+        .and_then(|cookies| cookies.trim().split("; ").map(parse_cookie_pair).collect())
 }
 
 pub fn print_cookies(cookies: HashMap<String, String>) -> String {
@@ -205,7 +213,6 @@ fn test_invalid_separator2() {
     assert_eq!(c, None);
 }
 
-#[ignore]
 #[test]
 fn test_invalid_separator3() {
     let c = parse_cookies("Cookie: name=value[ name2=value2");
